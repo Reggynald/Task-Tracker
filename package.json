@@ -1,0 +1,14 @@
+{
+  "name": "task-tracker-cli",
+  "version": "1.0.0",
+  "description": "Simple command line interface to track and manage tasks",
+  "main": "task-cli.js",
+  "bin": {
+    "task-cli": "./task-cli.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "start": "node task-cli.js"
+  },
+  "license": "MIT"
+}
