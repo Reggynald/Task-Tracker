@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <h1>Task Tracker</h1>
+
+    <form id="add-form" class="add-form">
+      <input
+        type="text"
+        id="description-input"
+        placeholder="Neue Aufgabe eingeben..."
+        autocomplete="off"
+        required
+      />
+      <button type="submit">Hinzufügen</button>
+    </form>
+
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-status="all">Alle</button>
+      <button class="filter-btn" data-status="todo">Todo</button>
+      <button class="filter-btn" data-status="in-progress">In Bearbeitung</button>
+      <button class="filter-btn" data-status="done">Erledigt</button>
+    </div>
+
+    <ul id="task-list" class="task-list"></ul>
+
+    <p id="empty-state" class="empty-state" hidden>Keine Aufgaben vorhanden.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
