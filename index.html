@@ -8,7 +8,10 @@
 </head>
 <body>
   <main class="app">
-    <h1>Task Tracker</h1>
+    <div class="header-row">
+      <h1>Task Tracker</h1>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Dark Mode umschalten">🌙</button>
+    </div>
 
     <form id="add-form" class="add-form">
       <input
@@ -30,7 +33,25 @@
 
     <ul id="task-list" class="task-list"></ul>
 
-    <p id="empty-state" class="empty-state" hidden>Keine Aufgaben vorhanden.</p>
+<p id="empty-state" class="empty-state" hidden>Noch keine Aufgaben hier ✨</p>
+
+    <div class="chalkboard-scene" id="chalkboard-scene">
+      <div class="chalkboard">
+        <div class="chalk-line"></div>
+      </div>
+      <div class="figure">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="arm"></div>
+        <div class="leg leg-left"></div>
+        <div class="leg leg-right"></div>
+      </div>
+    </div>
+
+    <button id="scene-toggle" class="scene-toggle" type="button">
+      <span class="status-dot"></span>
+      <span id="scene-toggle-label">Schreibt</span>
+    </button>
   </main>
 
   <script src="app.js"></script>
