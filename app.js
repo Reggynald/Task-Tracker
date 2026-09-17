@@ -5,6 +5,20 @@ const STATUS_LABELS = {
   done: 'Erledigt',
 };
 
+const EMPTY_MESSAGES = {
+  all: 'Noch keine Aufgaben hier ✨',
+  todo: 'Keine offenen Todos 🎉',
+  'in-progress': 'Gerade ist nichts in Bearbeitung',
+  done: 'Noch nichts erledigt',
+};
+
+const FILTER_LABELS = {
+  all: 'Alle',
+  todo: 'Todo',
+  'in-progress': 'In Bearbeitung',
+  done: 'Erledigt',
+};
+
 const form = document.getElementById('add-form');
 const input = document.getElementById('description-input');
 const list = document.getElementById('task-list');
@@ -12,6 +26,8 @@ const emptyState = document.getElementById('empty-state');
 const filters = document.getElementById('filters');
 
 let activeFilter = 'all';
+let enteringId = null;
+let pulsingId = null;
 
 function loadTasks() {
   try {
@@ -33,14 +49,16 @@ function nextId(tasks) {
 function addTask(description) {
   const tasks = loadTasks();
   const now = new Date().toISOString();
-  tasks.push({
+  const task = {
     id: nextId(tasks),
     description,
     status: 'todo',
     createdAt: now,
     updatedAt: now,
-  });
+  };
+  tasks.push(task);
   saveTasks(tasks);
+  return task;
 }
 
 function setStatus(id, status) {
@@ -63,6 +81,20 @@ function render() {
 
   list.innerHTML = '';
   emptyState.hidden = visible.length > 0;
+  list.innerHTML = '';
+  emptyState.hidden = visible.length > 0;
+  emptyState.textContent = EMPTY_MESSAGES[activeFilter];
+
+  const counts = {
+  all: tasks.length,
+  todo: tasks.filter((t) => t.status === 'todo').length,
+  'in-progress': tasks.filter((t) => t.status === 'in-progress').length,
+  done: tasks.filter((t) => t.status === 'done').length,
+  };
+  filters.querySelectorAll('.filter-btn').forEach((btn) => {
+    const status = btn.dataset.status;
+    btn.textContent = `${FILTER_LABELS[status]} · ${counts[status]}`;
+  });
 
   visible
     .slice()
@@ -70,6 +102,8 @@ function render() {
     .forEach((task) => {
       const li = document.createElement('li');
       li.className = `task-item ${task.status}`;
+      if (task.id === enteringId) li.classList.add('enter');
+      if (task.id === pulsingId) li.classList.add('complete-pulse');
 
       const statusBadge = document.createElement('span');
       statusBadge.className = `task-status ${task.status}`;
@@ -97,6 +131,7 @@ function render() {
         doneBtn.textContent = 'Erledigt';
         doneBtn.addEventListener('click', () => {
           setStatus(task.id, 'done');
+          pulsingId = task.id;
           render();
         });
         actions.appendChild(doneBtn);
@@ -106,21 +141,28 @@ function render() {
       deleteBtn.textContent = 'Löschen';
       deleteBtn.className = 'delete';
       deleteBtn.addEventListener('click', () => {
-        deleteTask(task.id);
-        render();
+        li.classList.add('removing');
+        li.addEventListener('transitionend', () => {
+          deleteTask(task.id);
+          render();
+        }, { once: true });
       });
       actions.appendChild(deleteBtn);
 
       li.append(statusBadge, description, actions);
       list.appendChild(li);
     });
+
+  enteringId = null;
+  pulsingId = null;
 }
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
   const description = input.value.trim();
   if (!description) return;
-  addTask(description);
+  const task = addTask(description);
+  enteringId = task.id;
   input.value = '';
   render();
 });
@@ -134,3 +176,53 @@ filters.addEventListener('click', (event) => {
 });
 
 render();
+
+const themeToggle = document.getElementById('theme-toggle');
+const THEME_KEY = 'task-tracker-theme';
+
+function isDarkActive(theme) {
+  return theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
+
+function applyTheme(theme) {
+  if (theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  themeToggle.textContent = isDarkActive(theme) ? '☀️' : '🌙';
+}
+
+applyTheme(localStorage.getItem(THEME_KEY));
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = isDarkActive(current) ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+});
+
+const sceneToggle = document.getElementById('scene-toggle');
+const sceneToggleLabel = document.getElementById('scene-toggle-label');
+const scene = document.getElementById('chalkboard-scene');
+const sceneModes = ['writing', 'paused', 'hidden'];
+const sceneLabels = {
+  writing: 'Schreibt',
+  paused: 'Pausiert',
+  hidden: 'Ausgeblendet',
+};
+let sceneModeIndex = 0;
+
+function applySceneMode(mode) {
+  scene.classList.toggle('paused', mode === 'paused');
+  scene.classList.toggle('hidden', mode === 'hidden');
+  sceneToggle.dataset.mode = mode;
+  sceneToggleLabel.textContent = sceneLabels[mode];
+}
+
+sceneToggle.addEventListener('click', () => {
+  sceneModeIndex = (sceneModeIndex + 1) % sceneModes.length;
+  applySceneMode(sceneModes[sceneModeIndex]);
+});
+
+applySceneMode(sceneModes[sceneModeIndex]);
