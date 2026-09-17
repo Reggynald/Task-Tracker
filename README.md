@@ -18,6 +18,3 @@ Jede Aufgabe hat eine ID, eine Beschreibung, einen Status (`todo`, `in-progress`
 Einfach `index.html` öffnen, oder live ansehen unter:
 👉 [reggynald.github.io/Task-Tracker](https://reggynald.github.io/Task-Tracker/)
 
-## Tech Stack
-
-Reines JavaScript, kein Framework, keine Dependencies.
